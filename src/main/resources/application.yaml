@@ -1,21 +1,9 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://137.184.136.186:5432/bd_principal
-    username: admin
-    password: 16042004Bb#$
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
   r2dbc:
-    url: r2dbc:postgresql://137.184.136.186:5432/bd_principal
+    url: r2dbc:postgresql://137.184.136.186:5432/bd_principal?schema=prueba_tecnica
     username: admin
-    password: 16042004Bb#$
+    password: 16042004Bb#$19
+
 
   application:
     name: backend

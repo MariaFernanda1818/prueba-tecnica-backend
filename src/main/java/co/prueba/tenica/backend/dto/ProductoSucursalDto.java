@@ -6,12 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class ProductoDto {
+public class ProductoSucursalDto {
 
-    private String codigo;
-    private String nombre;
+    private String productoId;
 
+    private Long sucursalId;
+
+    private Long stock;
 }

@@ -1,24 +1,24 @@
-package co.prueba.tenica.backend.entity.r2dbc;
+package co.prueba.tenica.backend.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("producto")
+@Table("producto_sucursal")
 @Data
-public class ProductoModel {
+public class ProductoSucursalModel {
 
     @Id
     private Long id;
 
-    @Column("nombre")
-    private String nombre;
-
-    @Column("stock")
-    private Integer stock;
+    @Column("producto_id")
+    private String productoId;
 
     @Column("sucursal_id")
     private Long sucursalId;
+
+    @Column("stock")
+    private Long stock;
 
 }

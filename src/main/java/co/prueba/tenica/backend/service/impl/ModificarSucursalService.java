@@ -1,4 +1,8 @@
 package co.prueba.tenica.backend.service.impl;
 
-public class ModificarSucursalService {
+import co.prueba.tenica.backend.service.IModificarSucursalService;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ModificarSucursalService implements IModificarSucursalService {
 }

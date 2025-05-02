@@ -1,14 +1,14 @@
 package co.prueba.tenica.backend.utils.configuration;
 
-import org.springframework.context.annotation.Bean;
+import org.springframework.web.server.WebFilter;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.springframework.context.annotation.Bean;
 
 @Configuration
 public class WebConfig {
+
     @Bean
-    ForwardedHeaderFilter forwardedHeaderFilter() {
-        return new ForwardedHeaderFilter();
+    public WebFilter forwardedHeaderFilter() {
+        return (exchange, chain) -> chain.filter(exchange); // opcional: lógica extra
     }
 }
-

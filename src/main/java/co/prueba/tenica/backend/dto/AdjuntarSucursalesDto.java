@@ -1,12 +1,16 @@
 package co.prueba.tenica.backend.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * DTO utilizado para adjuntar un producto a una sucursal
  * con la cantidad de stock correspondiente.
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AdjuntarSucursalesDto {
 
     /**

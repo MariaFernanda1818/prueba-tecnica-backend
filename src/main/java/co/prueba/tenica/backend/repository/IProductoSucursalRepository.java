@@ -1,6 +1,7 @@
 package co.prueba.tenica.backend.repository;
 
 import co.prueba.tenica.backend.entity.ProductoSucursalModel;
+import org.reactivestreams.Publisher;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
@@ -54,4 +55,13 @@ public interface IProductoSucursalRepository extends R2dbcRepository<ProductoSuc
      * @return Flux con todos los registros de ProductoSucursalModel para la sucursal.
      */
     Flux<ProductoSucursalModel> findAllBySucursalId(Long idSucursal);
+
+    /**
+     * Verifica si ya existe una asociación entre un producto y una sucursal.
+     *
+     * @param idSucursal     Identificador de la sucursal.
+     * @param codigoProducto Código único del producto.
+     * @return Mono que emite true si existe al menos una asociación, o false en caso contrario.
+     */
+    Mono<Boolean> existsBySucursalIdAndProductoId(Long idSucursal, String codigoProducto);
 }

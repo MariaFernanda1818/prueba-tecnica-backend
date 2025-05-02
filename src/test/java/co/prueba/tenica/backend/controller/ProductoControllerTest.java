@@ -1,19 +1,19 @@
 package co.prueba.tenica.backend.controller;
 
+import co.prueba.tenica.backend.dto.AdjuntarSucursalesDto;
+import co.prueba.tenica.backend.dto.in.InAgregarProductoSucursalDto;
 import co.prueba.tenica.backend.dto.in.InCrearProductoDto;
 import co.prueba.tenica.backend.dto.in.InModificarNombreProductoDto;
 import co.prueba.tenica.backend.dto.in.InModificarProductoStockDto;
 import co.prueba.tenica.backend.dto.resp.RespProductoMaxStockDto;
 import co.prueba.tenica.backend.dto.resp.RespuestaGeneralDto;
-import co.prueba.tenica.backend.service.ICrearProductoService;
-import co.prueba.tenica.backend.service.IEliminarProductoService;
-import co.prueba.tenica.backend.service.IModificarProductoService;
-import co.prueba.tenica.backend.service.IConsultarMaxStockProductoService;
+import co.prueba.tenica.backend.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +37,9 @@ class ProductoControllerTest {
 
     @Mock
     private ICrearProductoService crearService;
+
+    @Mock
+    private IAgregarProductoSucursalService agregarProductoSucursalService;
 
     @Mock
     private IConsultarMaxStockProductoService consultarService;
@@ -224,5 +227,57 @@ class ProductoControllerTest {
         assertNotNull(response.getBody());
         assertTrue(response.getBody().isError());
     }
+
+    @Test
+    void agregarProductoSucursalSuccessReturnsOk() {
+        // Arrange
+        InAgregarProductoSucursalDto dto = new InAgregarProductoSucursalDto();
+        dto.setCodigoProducto("P021");
+        dto.setSucursalesAdjuntar(List.of(
+                new AdjuntarSucursalesDto(2L, 10000L),
+                new AdjuntarSucursalesDto(3L, 10000L)
+        ));
+
+        RespuestaGeneralDto<Void> resp = Mockito.mock(RespuestaGeneralDto.class);
+        when(resp.isError()).thenReturn(false);
+        when(agregarProductoSucursalService.agregarProductoSucursal(any()))
+                .thenReturn(Mono.just(resp));
+
+        // Act
+        ResponseEntity<RespuestaGeneralDto<Void>> response = controller
+                .agregarProductoSucursal(dto)
+                .block();
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(resp, response.getBody());
+    }
+
+    @Test
+    void agregarProductoSucursalErrorReturnsInternalServerError() {
+        // Arrange
+        InAgregarProductoSucursalDto dto = new InAgregarProductoSucursalDto();
+        dto.setCodigoProducto("P021");
+        dto.setSucursalesAdjuntar(List.of(
+                new AdjuntarSucursalesDto(2L, 10000L)
+        ));
+
+        RespuestaGeneralDto<Void> resp = Mockito.mock(RespuestaGeneralDto.class);
+        when(resp.isError()).thenReturn(true);
+        when(agregarProductoSucursalService.agregarProductoSucursal(any()))
+                .thenReturn(Mono.just(resp));
+
+        // Act
+        ResponseEntity<RespuestaGeneralDto<Void>> response = controller
+                .agregarProductoSucursal(dto)
+                .block();
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(resp, response.getBody());
+    }
+
 
 }

@@ -206,12 +206,70 @@ public class Constantes {
 
     // ==================== Validaciones generales ====================
 
-    /** Mensaje de error general para validaciones en el cuerpo del request. */
+    /**
+     * Mensaje genérico para indicar errores de validación en el cuerpo de la petición.
+     */
     public static final String MSG_VALIDATION_ERRORS_BODY = "Errores de validación";
 
-    /** Mensaje de error general para validaciones en los parámetros del request. */
+    /**
+     * Mensaje genérico para indicar errores de validación en parámetros de la petición.
+     */
     public static final String MSG_VALIDATION_ERRORS_PARAMS = "Errores de validación de parámetros";
 
-
+    /**
+     * Mensaje de error cuando ocurre un problema al crear una franquicia.
+     */
     public static final String MSG_ERROR_CREAR_FRANQUICIA = "Error creando franquicia";
+
+    // ==================== Rutas ====================
+
+    /**
+     * Ruta para asociar un producto a una o varias sucursales.
+     */
+    public static final String AGREGAR_PRODUCTO_SUCURSAL_PATH = "/agregar-producto-sucursal";
+
+    // ==================== DTO InAgregarProductoSucursalDto ====================
+
+    /**
+     * Mensaje de error cuando el código de producto no es proporcionado.
+     */
+    public static final String MSG_CODIGO_PRODUCTO_OBLIGATORIO = "El código de producto es obligatorio";
+
+    /**
+     * Mensaje de error cuando el código de producto excede la longitud máxima.
+     */
+    public static final String MSG_CODIGO_PRODUCTO_MAX = "El código de producto no puede exceder 10 caracteres";
+
+    /**
+     * Mensaje de error cuando no se especifica ninguna sucursal.
+     */
+    public static final String MSG_SUCURSALES_OBLIGATORIO = "Debe especificar al menos una sucursal";
+
+    /**
+     * Mensaje de error cuando la lista de sucursales está vacía.
+     */
+    public static final String MSG_SUCURSALES_NO_VACIO = "La lista de sucursales no puede estar vacía";
+
+    // ==================== AgregarProductoSucursalService ====================
+
+    /**
+     * Mensaje de error cuando el producto no existe en el sistema.
+     */
+    public static final String MSG_PRODUCTO_NO_ENCONTRADO =
+            "El producto enviado no existe, por favor coloca uno que exista";
+
+    /**
+     * Formato de mensaje de error cuando la combinación producto–sucursal ya existe.
+     * <p>
+     * Usa String.format con idSucursal y codigoProducto.
+     */
+    public static final String MSG_COMBINACION_EXISTE =
+            "La combinación sucursal=%d y producto=%s ya existe";
+
+    /**
+     * Mensaje de éxito cuando todas las sucursales han sido procesadas correctamente.
+     */
+    public static final String MSG_TODAS_SUCURSALES_OK =
+            "Todas las sucursales procesadas con éxito";
+
 }

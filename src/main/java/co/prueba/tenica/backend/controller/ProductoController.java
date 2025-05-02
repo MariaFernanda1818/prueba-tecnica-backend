@@ -1,15 +1,10 @@
 package co.prueba.tenica.backend.controller;
 
-import co.prueba.tenica.backend.dto.in.InCrearProductoDto;
-import co.prueba.tenica.backend.dto.in.InModificarNombreDto;
-import co.prueba.tenica.backend.dto.in.InModificarNombreProductoDto;
-import co.prueba.tenica.backend.dto.in.InModificarProductoStockDto;
+import co.prueba.tenica.backend.dto.AdjuntarSucursalesDto;
+import co.prueba.tenica.backend.dto.in.*;
 import co.prueba.tenica.backend.dto.resp.RespProductoMaxStockDto;
 import co.prueba.tenica.backend.dto.resp.RespuestaGeneralDto;
-import co.prueba.tenica.backend.service.IConsultarMaxStockProductoService;
-import co.prueba.tenica.backend.service.ICrearProductoService;
-import co.prueba.tenica.backend.service.IEliminarProductoService;
-import co.prueba.tenica.backend.service.IModificarProductoService;
+import co.prueba.tenica.backend.service.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -41,6 +36,7 @@ public class ProductoController {
     private final IEliminarProductoService eliminarProductoService;
     private final ICrearProductoService crearProductoService;
     private final IConsultarMaxStockProductoService consultarMaxStockService;
+    private final IAgregarProductoSucursalService agregarProductoSucursalService;
 
     /**
      * Modifica el nombre de un producto existente.
@@ -122,6 +118,31 @@ public class ProductoController {
     @GetMapping(MAX_STOCK_PATH)
     public Mono<ResponseEntity<RespuestaGeneralDto<List<RespProductoMaxStockDto>>>> productoStockMax() {
         return consultarMaxStockService.productosMaxStockSucursal()
+                .map(res -> res.isError()
+                        ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res)
+                        : ResponseEntity.ok(res)
+                );
+    }
+
+    /**
+     * Asocia un producto a una o varias sucursales con la cantidad de stock indicada.
+     * <p>
+     * Valida que el producto exista; si no existe, devuelve un error.
+     * Valida que la asociación producto-sucursal no exista previamente; si existe, devuelve un error.
+     * En caso contrario, guarda la relación y su stock en la base de datos.
+     *
+     * @param agregarProductoSucursalDto DTO que contiene el código de producto y la lista de
+     *                                  objetos {@link AdjuntarSucursalesDto} con id de sucursal
+     * @return un {@link Mono} que emite un {@link ResponseEntity} con un
+     *         {@link RespuestaGeneralDto}{@code <Void>}:
+     *         <ul>
+     *           <li>error = true y mensaje de error si el producto no existe o la combinación ya existe</li>
+     *           <li>error = false y mensaje de éxito si todas las asociaciones se guardaron correctamente</li>
+     *         </ul>
+     */
+    @PutMapping(AGREGAR_PRODUCTO_SUCURSAL_PATH)
+    public Mono<ResponseEntity<RespuestaGeneralDto<Void>>> agregarProductoSucursal(@Valid @RequestBody InAgregarProductoSucursalDto agregarProductoSucursalDto) {
+        return agregarProductoSucursalService.agregarProductoSucursal(agregarProductoSucursalDto)
                 .map(res -> res.isError()
                         ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res)
                         : ResponseEntity.ok(res)

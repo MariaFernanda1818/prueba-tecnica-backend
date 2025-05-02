@@ -1,9 +1,30 @@
 spring:
+  webflux:
+    base-path: /api/v1
   r2dbc:
     url: r2dbc:postgresql://137.184.136.186:5432/bd_principal?schema=prueba_tecnica
     username: admin
     password: 16042004Bb#$19
 
-
   application:
     name: backend
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs           # el spec quedará en /api/v1/v3/api-docs
+  swagger-ui:
+    path: /swagger-ui            # la UI en /api/v1/swagger-ui/index.html
+    url: /v3/api-docs     # le apuntas al spec
+  info:
+    title: Acme Airlines API
+    version: 1.0.0
+    description: API reactiva con WebFlux
+
+server:
+  port: 8001
+
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE

@@ -1,69 +1,129 @@
 package co.prueba.tenica.backend.controller;
 
-import co.prueba.tenica.backend.dto.*;
+import co.prueba.tenica.backend.dto.in.InCrearProductoDto;
+import co.prueba.tenica.backend.dto.in.InModificarNombreDto;
+import co.prueba.tenica.backend.dto.in.InModificarNombreProductoDto;
+import co.prueba.tenica.backend.dto.in.InModificarProductoStockDto;
+import co.prueba.tenica.backend.dto.resp.RespProductoMaxStockDto;
+import co.prueba.tenica.backend.dto.resp.RespuestaGeneralDto;
+import co.prueba.tenica.backend.service.IConsultarMaxStockProductoService;
 import co.prueba.tenica.backend.service.ICrearProductoService;
 import co.prueba.tenica.backend.service.IEliminarProductoService;
 import co.prueba.tenica.backend.service.IModificarProductoService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static co.prueba.tenica.backend.utils.Constantes.*;
+
+/**
+ * Controlador REST para gestionar entidades Producto.
+ * Proporciona endpoints para crear, modificar, eliminar
+ * y consultar stock máximo de productos en sucursales.
+ */
 @RestController
-@RequestMapping("/producto")
+@RequestMapping(PRODUCTO_BASE_PATH)
 @RequiredArgsConstructor
+@Validated
 public class ProductoController {
 
-    private final IModificarProductoService iModificarProductoService;
-    private final IEliminarProductoService iEliminarProductoService;
-    private final ICrearProductoService iCrearProductoService;
+    private final IModificarProductoService modificarProductoService;
+    private final IEliminarProductoService eliminarProductoService;
+    private final ICrearProductoService crearProductoService;
+    private final IConsultarMaxStockProductoService consultarMaxStockService;
 
-    @PutMapping("/modificar-nombre")
-    public Mono<ResponseEntity<RespuestaGeneralDto<Void>>> modificarNombreProducto(@Valid @RequestBody InModificarNombreDto inModificar){
-        return iModificarProductoService.modificarNombreProducto(inModificar).map(respuesta -> {
-            if(respuesta.isError()){
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
-            }else{
-                return ResponseEntity.ok(respuesta);
-            }
-        });
+    /**
+     * Modifica el nombre de un producto existente.
+     *
+     * @param dto DTO con el código del producto y el nuevo nombre.
+     * @return Mono con ResponseEntity describiendo el resultado.
+     */
+    @PutMapping(MODIFY_NAME_PATH)
+    public Mono<ResponseEntity<RespuestaGeneralDto<Void>>> modificarNombreProducto(
+            @Valid @RequestBody InModificarNombreProductoDto dto) {
+        return modificarProductoService.modificarNombreProducto(dto)
+                .map(res -> res.isError()
+                        ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res)
+                        : ResponseEntity.ok(res)
+                );
     }
 
-    @DeleteMapping("/eliminar")
-    public Mono<ResponseEntity<RespuestaGeneralDto<Void>>> eliminarProductoSucursal(@RequestParam String codigoProducto, @RequestParam Long idSucursal){
-        return iEliminarProductoService.eliminarProductoSucursal(codigoProducto, idSucursal).map(respuesta -> {
-            if(respuesta.isError()){
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
-            }else{
-                return ResponseEntity.ok(respuesta);
-            }
-        });
+    /**
+     * Elimina un producto globalmente o de una sucursal.
+     *
+     * @param codigoProducto Código del producto a eliminar.
+     * @param idSucursal     Id de sucursal (opcional). Si se omite, se elimina globalmente.
+     * @return Mono con ResponseEntity describiendo el resultado.
+     */
+    @DeleteMapping(DELETE_PATH)
+    public Mono<ResponseEntity<RespuestaGeneralDto<Void>>> eliminarProductoSucursal(
+            @RequestParam
+            @NotBlank(message = MSG_CODIGO_OBLIGATORIO)
+            @Size(max = 10, message = MSG_CODIGO_MAX_10)
+            String codigoProducto,
+
+            @RequestParam(required = false)
+            Long idSucursal
+    ) {
+        return eliminarProductoService.eliminarProductoSucursal(codigoProducto, idSucursal)
+                .map(res -> res.isError()
+                        ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res)
+                        : ResponseEntity.ok(res)
+                );
     }
 
-    @PostMapping("/crear")
-    public Mono<ResponseEntity<RespuestaGeneralDto<Void>>>  crearProducto(@RequestBody InCrearProductoDto inCrearProductoDto){
-        return iCrearProductoService.crearProducto(inCrearProductoDto).map(respuesta -> {
-            if(respuesta.isError()){
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
-            }else{
-                return ResponseEntity.ok(respuesta);
-            }
-        });
+    /**
+     * Crea un nuevo producto.
+     *
+     * @param dto DTO con los datos del producto a crear y sucursales a adjuntar.
+     * @return Mono con ResponseEntity describiendo el resultado.
+     */
+    @PostMapping(CREATE_PATH)
+    public Mono<ResponseEntity<RespuestaGeneralDto<Void>>> crearProducto(
+            @Valid @RequestBody InCrearProductoDto dto) {
+        return crearProductoService.crearProducto(dto)
+                .map(res -> res.isError()
+                        ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res)
+                        : ResponseEntity.ok(res)
+                );
     }
 
-    @PutMapping("/modificar-stock")
-    public Mono<ResponseEntity<String>> modificarStockProducto(@RequestParam Long idProducto, @RequestParam Integer nuevoStock){
-        return Mono.just(ResponseEntity.ok("Se modifico correctamente"));
+    /**
+     * Modifica el stock de un producto en una sucursal.
+     *
+     * @param dto DTO con el código del producto, id de sucursal y nuevo stock.
+     * @return Mono con ResponseEntity describiendo el resultado.
+     */
+    @PutMapping(MODIFY_STOCK_PATH)
+    public Mono<ResponseEntity<RespuestaGeneralDto<Void>>> modificarStockProducto(
+            @Valid @RequestBody InModificarProductoStockDto dto) {
+        return modificarProductoService.modificarStockProducto(dto)
+                .map(res -> res.isError()
+                        ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res)
+                        : ResponseEntity.ok(res)
+                );
     }
 
-    @GetMapping("productos-stock-max")
-    public Flux<ResponseEntity<String>> productoStockMax(){
-        return Flux.just(ResponseEntity.ok("Se consulto correctamente el producto"));
+    /**
+     * Obtiene el producto con stock máximo para cada sucursal.
+     *
+     * @return Mono con ResponseEntity que envuelve un Flux de DTOs con el stock máximo.
+     */
+    @GetMapping(MAX_STOCK_PATH)
+    public Mono<ResponseEntity<RespuestaGeneralDto<Flux<RespProductoMaxStockDto>>>> productoStockMax() {
+        return consultarMaxStockService.productosMaxStockSucursal()
+                .map(res -> res.isError()
+                        ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res)
+                        : ResponseEntity.ok(res)
+                );
     }
-
-
-
 }
+

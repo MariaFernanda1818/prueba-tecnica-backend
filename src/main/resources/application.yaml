@@ -15,7 +15,6 @@ spring:
 
 server:
   port: 8001
-  forward-headers-strategy: framework   # <--- ESTA ES LA CLAVE
 
 springdoc:
   api-docs:

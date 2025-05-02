@@ -9,10 +9,6 @@ spring:
   application:
     name: backend
 
-  # ✅ Aquí agregamos la estrategia para aceptar headers del proxy (NGINX)
-  main:
-    web-application-type: reactive
-
 server:
   port: 8001
 

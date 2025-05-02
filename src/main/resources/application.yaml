@@ -13,11 +13,17 @@ server:
   port: 8001
 
 springdoc:
-  api-docs:
-    path: /v3/api-docs                 # queda accesible como /api/v1/v3/api-docs
   swagger-ui:
-    path: /swagger-ui                 # UI en /api/v1/swagger-ui/index.html
-    url: /v3/api-docs                 # referencia al spec
-  info:
-    title: Acme Airlines API
-    version: 1.0.0
+    path: /swagger-ui
+    url: /v3/api-docs
+    config-url: /v3/api-docs/swagger-config
+  api-docs:
+    path: /v3/api-docs
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+  packages-to-scan: co.tu.paquete.controller
+
+  # 👇 Aquí fuerzas que los esquemas sean HTTPS
+  pre-configured-schemes:
+    - https
+

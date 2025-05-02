@@ -20,6 +20,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -68,44 +71,53 @@ class ConsultarMaxStockProductoServiceTest {
         prodB.setCodigo("AAA57");
         prodB.setNombre("Producto B");
     }
-
     @Test
     void productosMaxStockSucursalReturnsMaxStockDto() {
+        // Arrange
         when(sucursalRepository.findAll()).thenReturn(Flux.just(sucursal1));
         when(productoSucursalRepository.findAllBySucursalId(1L))
                 .thenReturn(Flux.just(ps1a, ps1b));
-        when(productoRepository.findById(anyString())).thenReturn(Mono.just(prodA));
-        when(productoRepository.findById(anyString())).thenReturn(Mono.just(prodB));
 
-        Mono<RespuestaGeneralDto<Flux<RespProductoMaxStockDto>>> resultMono = service.productosMaxStockSucursal();
+        when(productoRepository.findById(ps1a.getProductoId()))
+                .thenReturn(Mono.just(prodA));
+        when(productoRepository.findById(ps1b.getProductoId()))
+                .thenReturn(Mono.just(prodB));
 
+        // Act
+        Mono<RespuestaGeneralDto<List<RespProductoMaxStockDto>>> resultMono = service.productosMaxStockSucursal();
+
+        // Assert
         StepVerifier.create(resultMono)
                 .assertNext(respuesta -> {
-                    // Verifica mensaje
-                    assert respuesta.getRespuesta() != null;
-                    Flux<RespProductoMaxStockDto> dataFlux = respuesta.getData();
-                    StepVerifier.create(dataFlux)
-                            .assertNext(dto -> {
-                                assert dto.getNombreSucursal().equals("Sucursal A");
-                                assert dto.getStock() == 10;
-                                assert dto.getNombreProducto().equals("Producto B");
-                            })
-                            .verifyComplete();
+                    assertNotNull(respuesta.getRespuesta());
+                    List<RespProductoMaxStockDto> data = respuesta.getData();
+                    assertNotNull(data);
+                    assertEquals(1, data.size());
+
+                    RespProductoMaxStockDto dto = data.get(0);
+                    assertEquals("Sucursal A", dto.getNombreSucursal());
+                    assertEquals(10, dto.getStock());
+                    assertEquals("Producto B", dto.getNombreProducto());
                 })
                 .verifyComplete();
     }
 
     @Test
     void productosMaxStockSucursalEmptyWhenNoSucursales() {
+        // Arrange
         when(sucursalRepository.findAll()).thenReturn(Flux.empty());
 
-        Mono<RespuestaGeneralDto<Flux<RespProductoMaxStockDto>>> resultMono = service.productosMaxStockSucursal();
+        // Act
+        Mono<RespuestaGeneralDto<List<RespProductoMaxStockDto>>> resultMono = service.productosMaxStockSucursal();
 
+        // Assert
         StepVerifier.create(resultMono)
                 .assertNext(respuesta -> {
-                    StepVerifier.create(respuesta.getData())
-                            .verifyComplete();
+                    List<RespProductoMaxStockDto> data = respuesta.getData();
+                    assertNotNull(data);
+                    assertTrue(data.isEmpty());
                 })
                 .verifyComplete();
     }
+
 }

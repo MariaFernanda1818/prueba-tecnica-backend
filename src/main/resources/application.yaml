@@ -9,22 +9,20 @@ spring:
   application:
     name: backend
 
-springdoc:
-  api-docs:
-    path: /v3/api-docs           # el spec quedará en /api/v1/v3/api-docs
-  swagger-ui:
-    path: /swagger-ui            # la UI en /api/v1/swagger-ui/index.html
-    url: /v3/api-docs     # le apuntas al spec
-  info:
-    title: Acme Airlines API
-    version: 1.0.0
-    description: API reactiva con WebFlux
+  # ✅ Aquí agregamos la estrategia para aceptar headers del proxy (NGINX)
+  main:
+    web-application-type: reactive
 
 server:
   port: 8001
+  forward-headers-strategy: framework   # <--- ESTA ES LA CLAVE
 
-logging:
-  level:
-    org:
-      springframework:
-        security: TRACE
+springdoc:
+  api-docs:
+    path: /v3/api-docs                 # queda accesible como /api/v1/v3/api-docs
+  swagger-ui:
+    path: /swagger-ui                 # UI en /api/v1/swagger-ui/index.html
+    url: /v3/api-docs                 # referencia al spec
+  info:
+    title: Acme Airlines API
+    version: 1.0.0

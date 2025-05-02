@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.util.Comparator;
+import java.util.List;
 
 import static co.prueba.tenica.backend.utils.Constantes.MSG_CONSULTA_MAX_STOCK_EXITOSA;
 
@@ -44,9 +45,9 @@ public class ConsultarMaxStockProductoService implements IConsultarMaxStockProdu
      *         el producto de mayor stock y la cantidad correspondiente.
      */
     @Override
-    public Mono<RespuestaGeneralDto<Flux<RespProductoMaxStockDto>>> productosMaxStockSucursal() {
+    public Mono<RespuestaGeneralDto<List<RespProductoMaxStockDto>>> productosMaxStockSucursal() {
         // Creamos el DTO principal y asignamos el mensaje de éxito
-        RespuestaGeneralDto<Flux<RespProductoMaxStockDto>> respuestaGeneral = new RespuestaGeneralDto<>();
+        RespuestaGeneralDto<List<RespProductoMaxStockDto>> respuestaGeneral = new RespuestaGeneralDto<>();
         respuestaGeneral.setRespuesta(MSG_CONSULTA_MAX_STOCK_EXITOSA);
 
         // Flujo reactivo que calcula el producto con máximo stock por sucursal
@@ -71,7 +72,9 @@ public class ConsultarMaxStockProductoService implements IConsultarMaxStockProdu
                                         })
                         );
 
-        respuestaGeneral.setData(productosMaxSucursal);
-        return Mono.just(respuestaGeneral);
+        return productosMaxSucursal.collectList().map(lista -> {
+            respuestaGeneral.setData(lista);
+            return respuestaGeneral;
+        });
     }
 }

@@ -20,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -173,34 +175,54 @@ class ProductoControllerTest {
 
     @Test
     void productoStockMaxSuccessReturnsOkWithFlux() {
+        // Arrange
         RespProductoMaxStockDto item = new RespProductoMaxStockDto();
-        Flux<RespProductoMaxStockDto> dataFlux = Flux.just(item);
-        RespuestaGeneralDto<Flux<RespProductoMaxStockDto>> resp = org.mockito.Mockito.mock(RespuestaGeneralDto.class);
-        when(resp.isError()).thenReturn(false);
-        when(resp.getData()).thenReturn(dataFlux);
-        when(consultarService.productosMaxStockSucursal()).thenReturn(Mono.just(resp));
+        item.setNombreSucursal("Sucursal A");
+        item.setNombreProducto("Producto X");
+        item.setStock(50L);
 
-        ResponseEntity<RespuestaGeneralDto<Flux<RespProductoMaxStockDto>>> response = controller
-                .productoStockMax().block();
+        List<RespProductoMaxStockDto> data = List.of(item);
 
+        RespuestaGeneralDto<List<RespProductoMaxStockDto>> responseDto = new RespuestaGeneralDto<>();
+        responseDto.setError(false);
+        responseDto.setRespuesta("Consulta exitosa");
+        responseDto.setData(data);
+
+        when(consultarService.productosMaxStockSucursal()).thenReturn(Mono.just(responseDto));
+
+        // Act
+        ResponseEntity<RespuestaGeneralDto<List<RespProductoMaxStockDto>>> response = controller.productoStockMax().block();
+
+        // Assert
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(resp, response.getBody());
-        // Opcional: verificar contenido del Flux
-        assertEquals(1, response.getBody().getData().collectList().block().size());
+        assertNotNull(response.getBody());
+        assertFalse(response.getBody().isError());
+
+        // Validar contenido del Flux
+        List<RespProductoMaxStockDto> resultList = response.getBody().getData();
+        assertNotNull(resultList);
+        assertEquals(1, resultList.size());
+        assertEquals("Sucursal A", resultList.get(0).getNombreSucursal());
     }
 
     @Test
     void productoStockMaxErrorReturnsInternalServerError() {
-        RespuestaGeneralDto<Flux<RespProductoMaxStockDto>> resp = org.mockito.Mockito.mock(RespuestaGeneralDto.class);
-        when(resp.isError()).thenReturn(true);
-        when(consultarService.productosMaxStockSucursal()).thenReturn(Mono.just(resp));
+        // Arrange
+        RespuestaGeneralDto<List<RespProductoMaxStockDto>> responseDto = new RespuestaGeneralDto<>();
+        responseDto.setError(true);
+        responseDto.setRespuesta("Ocurrió un error");
 
-        ResponseEntity<RespuestaGeneralDto<Flux<RespProductoMaxStockDto>>> response = controller
-                .productoStockMax().block();
+        when(consultarService.productosMaxStockSucursal()).thenReturn(Mono.just(responseDto));
 
+        // Act
+        ResponseEntity<RespuestaGeneralDto<List<RespProductoMaxStockDto>>> response = controller.productoStockMax().block();
+
+        // Assert
         assertNotNull(response);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals(resp, response.getBody());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().isError());
     }
+
 }

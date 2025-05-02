@@ -5,6 +5,8 @@ import co.prueba.tenica.backend.dto.resp.RespuestaGeneralDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 /**
  * Servicio para consultar el producto con mayor stock en cada sucursal.
  * Proporciona un método que devuelve, por cada sucursal,
@@ -19,6 +21,6 @@ public interface IConsultarMaxStockProductoService {
      *         de RespProductoMaxStockDto, donde cada elemento representa
      *         el producto de mayor stock en una sucursal.
      */
-    Mono<RespuestaGeneralDto<Flux<RespProductoMaxStockDto>>> productosMaxStockSucursal();
+    Mono<RespuestaGeneralDto<List<RespProductoMaxStockDto>>> productosMaxStockSucursal();
 
 }

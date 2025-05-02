@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 import static co.prueba.tenica.backend.utils.Constantes.*;
 
 /**
@@ -118,7 +120,7 @@ public class ProductoController {
      * @return Mono con ResponseEntity que envuelve un Flux de DTOs con el stock máximo.
      */
     @GetMapping(MAX_STOCK_PATH)
-    public Mono<ResponseEntity<RespuestaGeneralDto<Flux<RespProductoMaxStockDto>>>> productoStockMax() {
+    public Mono<ResponseEntity<RespuestaGeneralDto<List<RespProductoMaxStockDto>>>> productoStockMax() {
         return consultarMaxStockService.productosMaxStockSucursal()
                 .map(res -> res.isError()
                         ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res)
